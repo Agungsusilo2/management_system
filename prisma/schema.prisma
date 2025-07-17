@@ -1,0 +1,227 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserType {
+  Admin
+  Dosen
+  Mahasiswa
+}
+
+model User {
+  id            String   @id @db.VarChar(100)
+  username      String   @unique @db.VarChar(100)
+  password_hash String   @db.VarChar(255)
+  email         String   @unique @db.VarChar(100)
+  full_name     String   @db.VarChar(100)
+  user_type     UserType @default(Mahasiswa)
+  is_active     Boolean  @default(true)
+  created_at    DateTime @default(now())
+  updated_at    DateTime @updatedAt
+  token         String?  @db.VarChar(100)
+
+  admin Admin?
+
+  @@map("users")
+}
+
+model Admin {
+  id          String  @id @default(uuid())
+  userId      String  @unique
+  nipAdmin    String? @unique
+  jabatan     String?
+  phoneNumber String?
+  address     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("admins")
+}
+
+model Profesi {
+  KodeProfesi   String          @id @map("KodeProfesi") @db.VarChar(50)
+  Profesi       String?         @map("Profesi") @db.VarChar(255)
+  ProfilLulusan ProfilLulusan[]
+
+  @@map("Profesi")
+}
+
+model ProfilLulusan {
+  KodePL        String  @id @map("KodePL") @db.VarChar(50)
+  ProfilLulusan String? @map("ProfilLulusan") @db.VarChar(255)
+  KodeProfesi   String  @map("KodeProfesi") @db.VarChar(50)
+
+  profesi Profesi @relation(fields: [KodeProfesi], references: [KodeProfesi])
+  CPLPL   CPLPL[]
+
+  @@map("ProfilLulusan")
+}
+
+model Aspek {
+  KodeAspek String     @id @map("KodeAspek") @db.VarChar(50)
+  Aspek     String?    @map("Aspek") @db.VarChar(255)
+  CPLProdi  CPLProdi[]
+
+  @@map("Aspek")
+}
+
+model CPLProdi {
+  KodeCPL      String  @id @map("KodeCPL") @db.VarChar(50)
+  DeskripsiCPL String? @map("Deskripsi_CPL") @db.Text
+  KodeAspek    String  @map("KodeAspek") @db.VarChar(50)
+
+  aspek     Aspek       @relation(fields: [KodeAspek], references: [KodeAspek])
+  CPLPL     CPLPL[]
+  CPLBK     CPLBK[]
+  CPLMK     CPLMK[]
+  CPLBKMK   CPLBKMK[]
+  CPLCPMKMK CPLCPMKMK[]
+
+  @@map("CPL_Prodi")
+}
+
+model CPLPL {
+  KodeCPL String @map("KodeCPL") @db.VarChar(50)
+  KodePL  String @map("KodePL") @db.VarChar(50)
+
+  cplProdi      CPLProdi      @relation(fields: [KodeCPL], references: [KodeCPL])
+  profilLulusan ProfilLulusan @relation(fields: [KodePL], references: [KodePL])
+
+  @@id([KodeCPL, KodePL])
+  @@map("CPL_PL")
+}
+
+model Referensi {
+  KodeReferensi String        @id @map("KodeReferensi") @db.VarChar(50)
+  Referensi     String?       @map("Referensi") @db.VarChar(255)
+  BahanKajian   BahanKajian[]
+
+  @@map("Referensi")
+}
+
+model BahanKajian {
+  KodeBK        String  @id @map("KodeBK") @db.VarChar(50)
+  BahanKajian   String? @map("Bahan_Kajian") @db.VarChar(255) // Assuming VARCHAR for Bahan_Kajian content
+  KodeReferensi String  @map("KodeReferensi") @db.VarChar(50)
+
+  referensi Referensi @relation(fields: [KodeReferensi], references: [KodeReferensi])
+  CPLBK     CPLBK[]
+  BKMK      BKMK[]
+  CPLBKMK   CPLBKMK[]
+
+  @@map("Bahan_Kajian")
+}
+
+model CPLBK {
+  KodeCPL     String      @map("KodeCPL") @db.VarChar(50)
+  KodeBK      String      @map("KodeBK") @db.VarChar(50)
+  // Relations to CPLProdi and BahanKajian
+  cplProdi    CPLProdi    @relation(fields: [KodeCPL], references: [KodeCPL])
+  bahanKajian BahanKajian @relation(fields: [KodeBK], references: [KodeBK])
+
+  // Define composite primary key
+  @@id([KodeCPL, KodeBK])
+  @@map("CPL_BK")
+}
+
+model MataKuliah {
+  IDMK        String        @id @map("IDMK") @db.VarChar(50)
+  NamaMK      String?       @map("Nama_MK") @db.VarChar(255)
+  BKMK        BKMK[]
+  CPLMK       CPLMK[]
+  CPLBKMK     CPLBKMK[]
+  MLCPMKSubMK MLCPMKSubMK[]
+  CPLCPMKMK   CPLCPMKMK[]
+
+  @@map("Mata_Kuliah")
+}
+
+model BKMK {
+  KodeBK      String      @map("KodeBK") @db.VarChar(50)
+  IDMK        String      @map("IDMK") @db.VarChar(50)
+  bahanKajian BahanKajian @relation(fields: [KodeBK], references: [KodeBK])
+  mataKuliah  MataKuliah  @relation(fields: [IDMK], references: [IDMK])
+
+  @@id([KodeBK, IDMK])
+  @@map("BK_MK")
+}
+
+model CPLMK {
+  KodeCPL    String     @map("KodeCPL") @db.VarChar(50)
+  IDMK       String     @map("IDMK") @db.VarChar(50)
+  cplProdi   CPLProdi   @relation(fields: [KodeCPL], references: [KodeCPL])
+  mataKuliah MataKuliah @relation(fields: [IDMK], references: [IDMK])
+
+  @@id([KodeCPL, IDMK])
+  @@map("CPL_MK")
+}
+
+model CPLBKMK {
+  KodeCPL String @map("KodeCPL") @db.VarChar(50)
+  KodeBK  String @map("KodeBK") @db.VarChar(50)
+  IDMK    String @map("IDMK") @db.VarChar(50)
+
+  cplProdi    CPLProdi    @relation(fields: [KodeCPL], references: [KodeCPL])
+  bahanKajian BahanKajian @relation(fields: [KodeBK], references: [KodeBK])
+  mataKuliah  MataKuliah  @relation(fields: [IDMK], references: [IDMK])
+
+  @@id([KodeCPL, KodeBK, IDMK])
+  @@map("CPL_BK_MK")
+}
+
+model SubCPMK {
+  SubCPMK       String        @id @map("SubCPMK") @db.VarChar(50)
+  UraianSubCPMK String?       @map("Uraian_SubCPMK") @db.VarChar(255)
+  CPMKs         CPMK[] // Relation to CPMK (one-to-many from SubCPMK to CPMK)
+  MLCPMKSubMK   MLCPMKSubMK[]
+
+  @@map("SUB_CPMK")
+}
+
+model CPMK {
+  KodeCPMK String  @id @map("KodeCPMK") @db.VarChar(50)
+  CPMK     String? @map("CPMK") @db.VarChar(255)
+  SubCPMK  String  @map("SubCPMK") @db.VarChar(50) // Foreign Key field
+
+  subCPMK     SubCPMK       @relation(fields: [SubCPMK], references: [SubCPMK])
+  MLCPMKSubMK MLCPMKSubMK[]
+  CPLCPMKMK   CPLCPMKMK[]
+
+  @@map("CPMK")
+}
+
+model MLCPMKSubMK {
+  IDMK       String     @map("IDMK") @db.VarChar(50)
+  KodeCPMK   String     @map("KodeCPMK") @db.VarChar(50)
+  SubCPMK    String     @map("SubCPMK") @db.VarChar(50)
+  mataKuliah MataKuliah @relation(fields: [IDMK], references: [IDMK])
+  cpmk       CPMK       @relation(fields: [KodeCPMK], references: [KodeCPMK])
+  subCPMK    SubCPMK    @relation(fields: [SubCPMK], references: [SubCPMK])
+
+  @@id([IDMK, KodeCPMK, SubCPMK])
+  @@map("ML_CPMK_SUBMK")
+}
+
+model CPLCPMKMK {
+  KodeCPL    String     @map("KodeCPL") @db.VarChar(50)
+  KodeCPMK   String     @map("KodeCPMK") @db.VarChar(50)
+  IDMK       String     @map("IDMK") @db.VarChar(50)
+  cplProdi   CPLProdi   @relation(fields: [KodeCPL], references: [KodeCPL])
+  cpmk       CPMK       @relation(fields: [KodeCPMK], references: [KodeCPMK])
+  mataKuliah MataKuliah @relation(fields: [IDMK], references: [IDMK])
+
+  @@id([KodeCPL, KodeCPMK, IDMK])
+  @@map("CPL_CPMK_MK")
+}
