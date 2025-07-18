@@ -1,5 +1,4 @@
 "use strict";
-// src/service/profil-lulusan-service.ts
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -17,18 +16,15 @@ const profil_lulusan_validation_1 = require("../validation/profil-lulusan-valida
 const database_1 = require("../application/database");
 const response_error_1 = require("../error/response-error");
 class ProfilLulusanService {
-    // --- CREATE ---
     static create(request) {
         return __awaiter(this, void 0, void 0, function* () {
             const createRequest = validation_1.Validation.validate(profil_lulusan_validation_1.ProfilLulusanValidation.CREATE, request);
-            // Cek apakah ID sudah ada
             const existingPl = yield database_1.prismaClient.profilLulusan.count({
                 where: { KodePL: createRequest.kodePL }
             });
             if (existingPl > 0) {
                 throw new response_error_1.ResponseError(400, "Profil Lulusan with this ID already exists");
             }
-            // Cek apakah kodeProfesi valid jika diberikan
             if (createRequest.kodeProfesi) {
                 const profesiExists = yield database_1.prismaClient.profesi.count({
                     where: { KodeProfesi: createRequest.kodeProfesi }
@@ -51,7 +47,6 @@ class ProfilLulusanService {
             return (0, profile_lulusan_model_1.toProfilLulusanResponse)(newPl);
         });
     }
-    // --- GET by ID ---
     static get(kodePL) {
         return __awaiter(this, void 0, void 0, function* () {
             kodePL = validation_1.Validation.validate(profil_lulusan_validation_1.ProfilLulusanValidation.KODE_PL, kodePL);
@@ -65,7 +60,6 @@ class ProfilLulusanService {
             return (0, profile_lulusan_model_1.toProfilLulusanResponse)(pl);
         });
     }
-    // --- UPDATE ---
     static update(kodePL, request) {
         return __awaiter(this, void 0, void 0, function* () {
             var _a, _b;
@@ -88,7 +82,7 @@ class ProfilLulusanService {
             const updatedPl = yield database_1.prismaClient.profilLulusan.update({
                 where: { KodePL: kodePL },
                 data: {
-                    ProfilLulusan: (_a = updateRequest.deskripsi) !== null && _a !== void 0 ? _a : existingPl.ProfilLulusan, // Update field ProfilLulusan
+                    ProfilLulusan: (_a = updateRequest.deskripsi) !== null && _a !== void 0 ? _a : existingPl.ProfilLulusan,
                     KodeProfesi: (_b = updateRequest.kodeProfesi) !== null && _b !== void 0 ? _b : existingPl.KodeProfesi,
                 },
                 include: { profesi: true }
@@ -96,7 +90,6 @@ class ProfilLulusanService {
             return (0, profile_lulusan_model_1.toProfilLulusanResponse)(updatedPl);
         });
     }
-    // --- DELETE ---
     static remove(kodePL) {
         return __awaiter(this, void 0, void 0, function* () {
             kodePL = validation_1.Validation.validate(profil_lulusan_validation_1.ProfilLulusanValidation.KODE_PL, kodePL);
@@ -111,7 +104,6 @@ class ProfilLulusanService {
             });
         });
     }
-    // --- SEARCH / LIST ---
     static search(request) {
         return __awaiter(this, void 0, void 0, function* () {
             const searchRequest = validation_1.Validation.validate(profil_lulusan_validation_1.ProfilLulusanValidation.SEARCH, request);
@@ -136,7 +128,7 @@ class ProfilLulusanService {
                     take: searchRequest.size,
                     skip: skip,
                     include: { profesi: true },
-                    orderBy: { KodePL: 'asc' } // Urutkan berdasarkan KodePL
+                    orderBy: { KodePL: 'asc' }
                 }),
                 database_1.prismaClient.profilLulusan.count({ where: { AND: filters } })
             ]);

@@ -1,5 +1,4 @@
 "use strict";
-// src/service/profesi-service.ts
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -18,23 +17,17 @@ const database_1 = require("../application/database");
 const response_error_1 = require("../error/response-error");
 const zod_1 = require("zod");
 class ProfesiService {
-    // --- UPDATE Profesi ---
     static update(kodeProfesi, request) {
         return __awaiter(this, void 0, void 0, function* () {
             var _a;
-            // Validasi ID Profesi
             kodeProfesi = validation_1.Validation.validate(profesi_validation_1.ProfesiValidation.KODE_PROFESI, kodeProfesi);
-            // Validasi request body untuk update
             const updateRequest = validation_1.Validation.validate(profesi_validation_1.ProfesiValidation.UPDATE, request);
-            // Pastikan profesi ada
             const existingProfesi = yield database_1.prismaClient.profesi.findUnique({
                 where: { KodeProfesi: kodeProfesi }
             });
             if (!existingProfesi) {
                 throw new response_error_1.ResponseError(404, "Profesi not found");
             }
-            // Jika namaProfesi diupdate, pastikan tidak ada duplikasi jika kolom Profesi @unique
-            // (Berdasarkan skema Anda, Profesi.Profesi TIDAK @unique, jadi tidak perlu cek duplikasi)
             const updatedProfesi = yield database_1.prismaClient.profesi.update({
                 where: { KodeProfesi: kodeProfesi },
                 data: {
@@ -44,19 +37,15 @@ class ProfesiService {
             return (0, profesi_model_1.toProfesiResponse)(updatedProfesi);
         });
     }
-    // --- DELETE Profesi ---
     static remove(kodeProfesi) {
         return __awaiter(this, void 0, void 0, function* () {
-            // Validasi ID Profesi
             kodeProfesi = validation_1.Validation.validate(profesi_validation_1.ProfesiValidation.KODE_PROFESI, kodeProfesi);
-            // Pastikan profesi ada
             const existingProfesiCount = yield database_1.prismaClient.profesi.count({
                 where: { KodeProfesi: kodeProfesi }
             });
             if (existingProfesiCount === 0) {
                 throw new response_error_1.ResponseError(404, "Profesi not found");
             }
-            // Cek apakah ada ProfilLulusan yang masih merujuk ke profesi ini
             const profilLulusanCount = yield database_1.prismaClient.profilLulusan.count({
                 where: { KodeProfesi: kodeProfesi }
             });
@@ -68,7 +57,6 @@ class ProfesiService {
             });
         });
     }
-    // --- Opsional: GET Profesi ---
     static get(kodeProfesi) {
         return __awaiter(this, void 0, void 0, function* () {
             kodeProfesi = validation_1.Validation.validate(profesi_validation_1.ProfesiValidation.KODE_PROFESI, kodeProfesi);

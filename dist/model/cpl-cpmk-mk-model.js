@@ -1,8 +1,6 @@
 "use strict";
-// src/model/cpl-cpmk-mk-model.ts
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.toCPLCPMKMKResponse = toCPLCPMKMKResponse;
-// Fungsi transformasi dari objek Prisma ke response type
 function toCPLCPMKMKResponse(cplCpmkMk) {
     return {
         kodeCPL: cplCpmkMk.KodeCPL,

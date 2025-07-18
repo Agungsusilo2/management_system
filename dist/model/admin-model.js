@@ -1,5 +1,4 @@
 "use strict";
-// src/model/admin-model.ts
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.toAdminResponse = toAdminResponse;
 function toAdminResponse(admin) {

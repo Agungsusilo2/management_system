@@ -1,5 +1,4 @@
 "use strict";
-// src/service/ml-cpmk-submk-service.ts
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -17,11 +16,9 @@ const ml_cpmk_submk_validation_1 = require("../validation/ml-cpmk-submk-validati
 const database_1 = require("../application/database");
 const response_error_1 = require("../error/response-error");
 class MLCPMKSubMKService {
-    // --- CREATE (Link) MLCPMKSubMK ---
     static create(request) {
         return __awaiter(this, void 0, void 0, function* () {
             const createRequest = validation_1.Validation.validate(ml_cpmk_submk_validation_1.MLCPMKSubMKValidation.LINK_UNLINK, request);
-            // Cek apakah MataKuliah, CPMK, dan SubCPMK ada
             const mkExists = yield database_1.prismaClient.mataKuliah.count({ where: { IDMK: createRequest.idmk } });
             if (mkExists === 0) {
                 throw new response_error_1.ResponseError(404, "Mata Kuliah not found");
@@ -34,7 +31,6 @@ class MLCPMKSubMKService {
             if (subCpmkExists === 0) {
                 throw new response_error_1.ResponseError(404, "SubCPMK not found");
             }
-            // Cek apakah tautan sudah ada
             const existingLink = yield database_1.prismaClient.mLCPMKSubMK.count({
                 where: {
                     IDMK: createRequest.idmk,
@@ -51,12 +47,11 @@ class MLCPMKSubMKService {
                     KodeCPMK: createRequest.kodeCPMK,
                     SubCPMK: createRequest.subCPMKId,
                 },
-                include: { mataKuliah: true, cpmk: true, subCPMK: true } // Sertakan detail relasi untuk response
+                include: { mataKuliah: true, cpmk: true, subCPMK: true }
             });
             return (0, ml_cpmk_submk_model_1.toMLCPMKSubMKResponse)(newLink);
         });
     }
-    // --- REMOVE (Unlink) MLCPMKSubMK ---
     static remove(request) {
         return __awaiter(this, void 0, void 0, function* () {
             const deleteRequest = validation_1.Validation.validate(ml_cpmk_submk_validation_1.MLCPMKSubMKValidation.LINK_UNLINK, request);
@@ -72,7 +67,6 @@ class MLCPMKSubMKService {
             }
             yield database_1.prismaClient.mLCPMKSubMK.delete({
                 where: {
-                    // Menggunakan nama composite primary key dari Prisma untuk 3 kolom
                     IDMK_KodeCPMK_SubCPMK: {
                         IDMK: deleteRequest.idmk,
                         KodeCPMK: deleteRequest.kodeCPMK,
@@ -82,7 +76,6 @@ class MLCPMKSubMKService {
             });
         });
     }
-    // --- SEARCH / LIST MLCPMKSubMK ---
     static search(request) {
         return __awaiter(this, void 0, void 0, function* () {
             const searchRequest = validation_1.Validation.validate(ml_cpmk_submk_validation_1.MLCPMKSubMKValidation.SEARCH, request);
@@ -102,7 +95,7 @@ class MLCPMKSubMKService {
                     where: { AND: filters },
                     take: searchRequest.size,
                     skip: skip,
-                    include: { mataKuliah: true, cpmk: true, subCPMK: true }, // Sertakan detail relasi
+                    include: { mataKuliah: true, cpmk: true, subCPMK: true },
                     orderBy: { IDMK: 'asc' }
                 }),
                 database_1.prismaClient.mLCPMKSubMK.count({ where: { AND: filters } })

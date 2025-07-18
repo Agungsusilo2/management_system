@@ -1,8 +1,6 @@
 "use strict";
-// src/model/cpl-prodi-model.ts
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.toCPLProdiResponse = toCPLProdiResponse;
-// Sesuaikan fungsi toCPLProdiResponse
 function toCPLProdiResponse(cplProdi) {
     return {
         kodeCPL: cplProdi.KodeCPL,

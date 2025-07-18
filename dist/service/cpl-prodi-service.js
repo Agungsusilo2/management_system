@@ -1,5 +1,4 @@
 "use strict";
-// src/service/cpl-prodi-service.ts
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -17,7 +16,6 @@ const cpl_prodi_validation_1 = require("../validation/cpl-prodi-validation");
 const database_1 = require("../application/database");
 const response_error_1 = require("../error/response-error");
 class CPLProdiService {
-    // --- CREATE CPLProdi ---
     static create(request) {
         return __awaiter(this, void 0, void 0, function* () {
             const createRequest = validation_1.Validation.validate(cpl_prodi_validation_1.CPLProdiValidation.CREATE, request);
@@ -27,38 +25,26 @@ class CPLProdiService {
             if (existingCPL > 0) {
                 throw new response_error_1.ResponseError(400, "CPL Prodi with this KodeCPL already exists");
             }
-            // Cek validitas KodeAspek
             if (createRequest.kodeAspek) {
                 const aspekExists = yield database_1.prismaClient.aspek.count({ where: { KodeAspek: createRequest.kodeAspek } });
                 if (aspekExists === 0) {
                     throw new response_error_1.ResponseError(400, "Aspek ID not found");
                 }
             }
-            // **PERBAIKAN DI SINI:** Buat objek data secara kondisional
             const data = {
-                // Lebih baik lagi jika CreateCPLProdiRequest mendefinisikan KodeAspek sebagai string | null
                 KodeCPL: createRequest.kodeCPL,
                 DeskripsiCPL: createRequest.deskripsiCPL,
             };
             if (createRequest.kodeAspek !== undefined && createRequest.kodeAspek !== null) {
                 data.KodeAspek = createRequest.kodeAspek;
             }
-            else {
-                // Jika KodeAspek opsional di schema.prisma, dan Anda ingin mengaturnya ke null secara eksplisit
-                // saat tidak ada nilai dari request, tambahkan baris ini:
-                // data.KodeAspek = null;
-                // Namun, jika KodeAspek bersifat opsional dan tidak nullable (misal hanya String?),
-                // maka cukup jangan tambahkan properti 'KodeAspek' jika undefined/null.
-            }
             const newCPL = yield database_1.prismaClient.cPLProdi.create({
-                data: data, // Gunakan objek data yang sudah diolah
+                data: data,
                 include: { aspek: true }
             });
             return (0, cpl_prodi_model_1.toCPLProdiResponse)(newCPL);
         });
     }
-    // --- Bagian GET, UPDATE, DELETE, SEARCH tidak perlu perubahan untuk error ini ---
-    // Pastikan jika ada properti serupa di UPDATE, Anda juga menerapkan logika kondisional yang sama.
     static get(kodeCPL) {
         return __awaiter(this, void 0, void 0, function* () {
             kodeCPL = validation_1.Validation.validate(cpl_prodi_validation_1.CPLProdiValidation.KODE_CPL, kodeCPL);
@@ -89,26 +75,18 @@ class CPLProdiService {
                     throw new response_error_1.ResponseError(400, "Aspek ID not found");
                 }
             }
-            // **PERBAIKAN UNTUK UPDATE JUGA:** Buat objek data secara kondisional
             const updateData = {
                 DeskripsiCPL: (_a = updateRequest.deskripsiCPL) !== null && _a !== void 0 ? _a : existingCPL.DeskripsiCPL,
             };
-            // Hanya tambahkan KodeAspek jika ada di request atau jika ingin mengosongkan menjadi null
-            if (updateRequest.kodeAspek !== undefined) { // Check for undefined to allow explicit null
+            if (updateRequest.kodeAspek !== undefined) {
                 updateData.KodeAspek = updateRequest.kodeAspek;
             }
             else {
-                // Jika KodeAspek di skema Prisma adalah opsional (String? atau String | null)
-                // dan Anda tidak menyediakannya di request, maka biarkan Prisma tidak mengubahnya.
-                // Jika Anda ingin secara eksplisit mengosongkannya jika tidak ada di request,
-                // Anda harus mengirim 'null': updateData.KodeAspek = null;
-                // Untuk saat ini, kita ikuti perilaku `updateRequest.kodeAspek ?? existingCPL.KodeAspek`
-                // yang sudah ada, namun lebih eksplisit dengan conditional assign
-                updateData.KodeAspek = existingCPL.KodeAspek; // Pertahankan nilai yang sudah ada jika tidak diupdate
+                updateData.KodeAspek = existingCPL.KodeAspek;
             }
             const updatedCPL = yield database_1.prismaClient.cPLProdi.update({
                 where: { KodeCPL: kodeCPL },
-                data: updateData, // Gunakan objek updateData yang sudah diolah
+                data: updateData,
                 include: { aspek: true }
             });
             return (0, cpl_prodi_model_1.toCPLProdiResponse)(updatedCPL);
@@ -141,7 +119,7 @@ class CPLProdiService {
                     }
                 });
             }
-            if (searchRequest.kodeAspek) { // Ini sudah menangani string, bukan undefined
+            if (searchRequest.kodeAspek) {
                 filters.push({
                     KodeAspek: searchRequest.kodeAspek
                 });

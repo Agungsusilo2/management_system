@@ -1,5 +1,4 @@
 "use strict";
-// src/service/referensi-service.ts
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -17,7 +16,6 @@ const referensi_validation_1 = require("../validation/referensi-validation");
 const database_1 = require("../application/database");
 const response_error_1 = require("../error/response-error");
 class ReferensiService {
-    // --- CREATE Referensi ---
     static create(request) {
         return __awaiter(this, void 0, void 0, function* () {
             const createRequest = validation_1.Validation.validate(referensi_validation_1.ReferensiValidation.CREATE, request);
@@ -30,13 +28,12 @@ class ReferensiService {
             const newReferensi = yield database_1.prismaClient.referensi.create({
                 data: {
                     KodeReferensi: createRequest.kodeReferensi,
-                    Referensi: createRequest.namaReferensi, // Mapping ke kolom 'Referensi' di DB
+                    Referensi: createRequest.namaReferensi,
                 },
             });
             return (0, referensi_model_1.toReferensiResponse)(newReferensi);
         });
     }
-    // --- GET Referensi by ID ---
     static get(kodeReferensi) {
         return __awaiter(this, void 0, void 0, function* () {
             kodeReferensi = validation_1.Validation.validate(referensi_validation_1.ReferensiValidation.KODE_REFERENSI, kodeReferensi);
@@ -49,7 +46,6 @@ class ReferensiService {
             return (0, referensi_model_1.toReferensiResponse)(referensi);
         });
     }
-    // --- UPDATE Referensi ---
     static update(kodeReferensi, request) {
         return __awaiter(this, void 0, void 0, function* () {
             var _a;
@@ -70,7 +66,6 @@ class ReferensiService {
             return (0, referensi_model_1.toReferensiResponse)(updatedReferensi);
         });
     }
-    // --- DELETE Referensi ---
     static remove(kodeReferensi) {
         return __awaiter(this, void 0, void 0, function* () {
             kodeReferensi = validation_1.Validation.validate(referensi_validation_1.ReferensiValidation.KODE_REFERENSI, kodeReferensi);
@@ -80,7 +75,6 @@ class ReferensiService {
             if (existingReferensiCount === 0) {
                 throw new response_error_1.ResponseError(404, "Referensi not found");
             }
-            // Cek apakah ada BahanKajian yang masih merujuk ke referensi ini
             const bahanKajianCount = yield database_1.prismaClient.bahanKajian.count({
                 where: { KodeReferensi: kodeReferensi }
             });
@@ -92,7 +86,6 @@ class ReferensiService {
             });
         });
     }
-    // --- SEARCH / LIST Referensi ---
     static search(request) {
         return __awaiter(this, void 0, void 0, function* () {
             const searchRequest = validation_1.Validation.validate(referensi_validation_1.ReferensiValidation.SEARCH, request);

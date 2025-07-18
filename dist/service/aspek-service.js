@@ -1,5 +1,4 @@
 "use strict";
-// src/service/aspek-service.ts
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -17,7 +16,6 @@ const database_1 = require("../application/database");
 const response_error_1 = require("../error/response-error");
 const aspek_model_1 = require("../model/aspek-model");
 class AspekService {
-    // --- CREATE Aspek ---
     static create(request) {
         return __awaiter(this, void 0, void 0, function* () {
             const createRequest = validation_1.Validation.validate(aspek_validation_1.AspekValidation.CREATE, request);
@@ -30,13 +28,12 @@ class AspekService {
             const newAspek = yield database_1.prismaClient.aspek.create({
                 data: {
                     KodeAspek: createRequest.kodeAspek,
-                    Aspek: createRequest.namaAspek, // Mapping ke kolom 'Aspek' di DB
+                    Aspek: createRequest.namaAspek,
                 },
             });
             return (0, aspek_model_1.toAspekResponse)(newAspek);
         });
     }
-    // --- GET Aspek by ID ---
     static get(kodeAspek) {
         return __awaiter(this, void 0, void 0, function* () {
             kodeAspek = validation_1.Validation.validate(aspek_validation_1.AspekValidation.KODE_ASPEK, kodeAspek);
@@ -49,7 +46,6 @@ class AspekService {
             return (0, aspek_model_1.toAspekResponse)(aspek);
         });
     }
-    // --- UPDATE Aspek ---
     static update(kodeAspek, request) {
         return __awaiter(this, void 0, void 0, function* () {
             var _a;
@@ -70,7 +66,6 @@ class AspekService {
             return (0, aspek_model_1.toAspekResponse)(updatedAspek);
         });
     }
-    // --- DELETE Aspek ---
     static remove(kodeAspek) {
         return __awaiter(this, void 0, void 0, function* () {
             kodeAspek = validation_1.Validation.validate(aspek_validation_1.AspekValidation.KODE_ASPEK, kodeAspek);
@@ -80,7 +75,6 @@ class AspekService {
             if (existingAspekCount === 0) {
                 throw new response_error_1.ResponseError(404, "Aspek not found");
             }
-            // Cek apakah ada CPLProdi yang masih merujuk ke aspek ini
             const cplProdiCount = yield database_1.prismaClient.cPLProdi.count({
                 where: { KodeAspek: kodeAspek }
             });
@@ -92,7 +86,6 @@ class AspekService {
             });
         });
     }
-    // --- SEARCH / LIST Aspek ---
     static search(request) {
         return __awaiter(this, void 0, void 0, function* () {
             const searchRequest = validation_1.Validation.validate(aspek_validation_1.AspekValidation.SEARCH, request);

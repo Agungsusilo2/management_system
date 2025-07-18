@@ -1,5 +1,4 @@
 "use strict";
-// src/service/admin-service.ts
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -71,13 +70,12 @@ class AdminService {
             if (!existingAdmin) {
                 throw new response_error_1.ResponseError(404, "Admin not found or unauthorized");
             }
-            // Cek jika ada nipAdmin baru dan sudah dipakai oleh admin lain
             if (updateRequest.nipAdmin) {
                 const nipAdminExists = yield database_1.prismaClient.admin.count({
                     where: {
                         nipAdmin: updateRequest.nipAdmin,
                         id: {
-                            not: adminId // Kecuali admin yang sedang diupdate itu sendiri
+                            not: adminId
                         }
                     }
                 });
@@ -87,7 +85,7 @@ class AdminService {
             }
             const updatedAdmin = yield database_1.prismaClient.admin.update({
                 where: {
-                    id: adminId // ID admin yang akan diupdate
+                    id: adminId
                 },
                 data: {
                     nipAdmin: (_a = updateRequest.nipAdmin) !== null && _a !== void 0 ? _a : existingAdmin.nipAdmin, // Gunakan ?? untuk update parsial
@@ -99,23 +97,18 @@ class AdminService {
             return (0, admin_model_1.toAdminResponse)(updatedAdmin);
         });
     }
-    // --- METODE BARU: DELETE ---
     static remove(user, adminId) {
         return __awaiter(this, void 0, void 0, function* () {
-            // Validasi adminId
             adminId = validation_1.Validation.validate(admin_validation_1.AdminValidation.ADMIN_ID, adminId);
-            // Pastikan admin yang akan dihapus ada dan dimiliki oleh user yang bersangkutan (otorisasi)
             const existingAdmin = yield database_1.prismaClient.admin.findUnique({
                 where: {
                     id: adminId,
-                    userId: user.id // Hanya user yang merupakan admin ini yang bisa menghapus profilnya sendiri
+                    userId: user.id
                 }
             });
             if (!existingAdmin) {
                 throw new response_error_1.ResponseError(404, "Admin not found or unauthorized");
             }
-            // Lakukan penghapusan Admin. Karena onDelete: Cascade di relasi User,
-            // user yang terkait juga akan terhapus.
             yield database_1.prismaClient.admin.delete({
                 where: {
                     id: adminId
@@ -123,7 +116,6 @@ class AdminService {
             });
         });
     }
-    // --- METODE BARU: SEARCH/LIST ---
     static search(request) {
         return __awaiter(this, void 0, void 0, function* () {
             const searchRequest = validation_1.Validation.validate(admin_validation_1.AdminValidation.SEARCH, request);
@@ -132,8 +124,8 @@ class AdminService {
             if (searchRequest.nipAdmin) {
                 filters.push({
                     nipAdmin: {
-                        contains: searchRequest.nipAdmin, // Cari yang mengandung substring
-                        mode: 'insensitive' // Opsional: case-insensitive search
+                        contains: searchRequest.nipAdmin,
+                        mode: 'insensitive'
                     }
                 });
             }
@@ -147,13 +139,12 @@ class AdminService {
             }
             const admins = yield database_1.prismaClient.admin.findMany({
                 where: {
-                    AND: filters // Gabungkan semua filter dengan AND
+                    AND: filters
                 },
                 take: searchRequest.size,
                 skip: skip,
-                // Order by (opsional, tapi bagus untuk list)
                 orderBy: {
-                    nipAdmin: 'asc' // Urutkan berdasarkan NIP Admin secara ascending
+                    nipAdmin: 'asc'
                 },
                 include: {
                     user: {
@@ -171,7 +162,6 @@ class AdminService {
                     AND: filters
                 }
             });
-            // Transformasi hasil dari Prisma ke AdminResponse
             const adminResponses = admins.map(admin => {
                 return (0, admin_model_1.toAdminResponse)(admin);
             });

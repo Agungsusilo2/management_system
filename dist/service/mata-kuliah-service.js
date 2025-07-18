@@ -1,5 +1,4 @@
 "use strict";
-// src/service/mata-kuliah-service.ts
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -17,7 +16,6 @@ const mata_kuliah_validation_1 = require("../validation/mata-kuliah-validation")
 const database_1 = require("../application/database");
 const response_error_1 = require("../error/response-error");
 class MataKuliahService {
-    // --- CREATE MataKuliah ---
     static create(request) {
         return __awaiter(this, void 0, void 0, function* () {
             const createRequest = validation_1.Validation.validate(mata_kuliah_validation_1.MataKuliahValidation.CREATE, request);
@@ -30,13 +28,12 @@ class MataKuliahService {
             const newMK = yield database_1.prismaClient.mataKuliah.create({
                 data: {
                     IDMK: createRequest.idmk,
-                    NamaMK: createRequest.namaMk, // Mapping ke kolom 'Nama_MK' di DB
+                    NamaMK: createRequest.namaMk,
                 },
             });
             return (0, mata_kuliah_model_1.toMataKuliahResponse)(newMK);
         });
     }
-    // --- GET MataKuliah by ID ---
     static get(idmk) {
         return __awaiter(this, void 0, void 0, function* () {
             idmk = validation_1.Validation.validate(mata_kuliah_validation_1.MataKuliahValidation.IDMK, idmk);
@@ -49,7 +46,6 @@ class MataKuliahService {
             return (0, mata_kuliah_model_1.toMataKuliahResponse)(mk);
         });
     }
-    // --- UPDATE MataKuliah ---
     static update(idmk, request) {
         return __awaiter(this, void 0, void 0, function* () {
             var _a;
@@ -70,7 +66,6 @@ class MataKuliahService {
             return (0, mata_kuliah_model_1.toMataKuliahResponse)(updatedMK);
         });
     }
-    // --- DELETE MataKuliah ---
     static remove(idmk) {
         return __awaiter(this, void 0, void 0, function* () {
             idmk = validation_1.Validation.validate(mata_kuliah_validation_1.MataKuliahValidation.IDMK, idmk);
@@ -80,15 +75,6 @@ class MataKuliahService {
             if (existingMKCount === 0) {
                 throw new response_error_1.ResponseError(404, "Mata Kuliah not found");
             }
-            // --- PENTING: Tambahkan cek relasi ke tabel-tabel lain ---
-            // Jika ada tabel yang memiliki Foreign Key ke MataKuliah.IDMK (contoh: CPLMK, BK-MK, CPMK, Penilaian, Enrollment),
-            // Anda HARUS menambahkan cek di sini untuk mencegah error Foreign Key, atau pastikan
-            // relasi di schema.prisma memiliki onDelete: Cascade.
-            // Contoh cek (jika relasi tidak di-cascade):
-            // const cplMkCount = await prismaClient.cPLMK.count({ where: { IDMK: idmk } });
-            // if (cplMkCount > 0) {
-            //     throw new ResponseError(400, "Cannot delete Mata Kuliah: still referenced by CPL-MK");
-            // }
             yield database_1.prismaClient.mataKuliah.delete({
                 where: { IDMK: idmk }
             });

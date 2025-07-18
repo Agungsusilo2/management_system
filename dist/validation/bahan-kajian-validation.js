@@ -1,5 +1,4 @@
 "use strict";
-// src/validation/bahan-kajian-validation.ts
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.BahanKajianValidation = void 0;
 const zod_1 = require("zod");
@@ -9,7 +8,7 @@ exports.BahanKajianValidation = BahanKajianValidation;
 BahanKajianValidation.CREATE = zod_1.z.object({
     kodeBK: zod_1.z.string().max(50),
     namaBahanKajian: zod_1.z.string().min(1).max(255),
-    kodeReferensi: zod_1.z.string().max(50), // Wajib
+    kodeReferensi: zod_1.z.string().max(50),
 });
 BahanKajianValidation.UPDATE = zod_1.z.object({
     namaBahanKajian: zod_1.z.string().min(1).max(255).optional(),

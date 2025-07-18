@@ -1,5 +1,4 @@
 "use strict";
-// src/service/bahan-kajian-service.ts
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -17,7 +16,6 @@ const bahan_kajian_validation_1 = require("../validation/bahan-kajian-validation
 const database_1 = require("../application/database");
 const response_error_1 = require("../error/response-error");
 class BahanKajianService {
-    // --- CREATE BahanKajian ---
     static create(request) {
         return __awaiter(this, void 0, void 0, function* () {
             const createRequest = validation_1.Validation.validate(bahan_kajian_validation_1.BahanKajianValidation.CREATE, request);
@@ -27,7 +25,6 @@ class BahanKajianService {
             if (existingBK > 0) {
                 throw new response_error_1.ResponseError(400, "Bahan Kajian with this KodeBK already exists");
             }
-            // Cek apakah kodeReferensi valid
             const referensiExists = yield database_1.prismaClient.referensi.count({
                 where: { KodeReferensi: createRequest.kodeReferensi }
             });
@@ -45,7 +42,6 @@ class BahanKajianService {
             return (0, bahan_kajian_model_1.toBahanKajianResponse)(newBK);
         });
     }
-    // --- GET BahanKajian by ID ---
     static get(kodeBK) {
         return __awaiter(this, void 0, void 0, function* () {
             kodeBK = validation_1.Validation.validate(bahan_kajian_validation_1.BahanKajianValidation.KODE_BK, kodeBK);
@@ -59,7 +55,6 @@ class BahanKajianService {
             return (0, bahan_kajian_model_1.toBahanKajianResponse)(bk);
         });
     }
-    // --- UPDATE BahanKajian ---
     static update(kodeBK, request) {
         return __awaiter(this, void 0, void 0, function* () {
             var _a, _b;
@@ -71,7 +66,6 @@ class BahanKajianService {
             if (!existingBK) {
                 throw new response_error_1.ResponseError(404, "Bahan Kajian not found");
             }
-            // Cek validitas kodeReferensi jika diupdate
             if (updateRequest.kodeReferensi) {
                 const referensiExists = yield database_1.prismaClient.referensi.count({
                     where: { KodeReferensi: updateRequest.kodeReferensi }
@@ -91,7 +85,6 @@ class BahanKajianService {
             return (0, bahan_kajian_model_1.toBahanKajianResponse)(updatedBK);
         });
     }
-    // --- DELETE BahanKajian ---
     static remove(kodeBK) {
         return __awaiter(this, void 0, void 0, function* () {
             kodeBK = validation_1.Validation.validate(bahan_kajian_validation_1.BahanKajianValidation.KODE_BK, kodeBK);
@@ -101,9 +94,6 @@ class BahanKajianService {
             if (existingBKCount === 0) {
                 throw new response_error_1.ResponseError(404, "Bahan Kajian not found");
             }
-            // Tambahkan cek relasi ke tabel join lainnya jika ada (CPL-BK, BK-MK, CPL-BK-MK)
-            // const cplBkCount = await prismaClient.cPLBK.count({ where: { KodeBK: kodeBK } });
-            // if (cplBkCount > 0) { throw new ResponseError(400, "Cannot delete Bahan Kajian: still referenced by CPL-BK"); }
             yield database_1.prismaClient.bahanKajian.delete({
                 where: { KodeBK: kodeBK }
             });

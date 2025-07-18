@@ -1,5 +1,4 @@
 "use strict";
-// src/service/cpl-bk-service.ts
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -17,11 +16,9 @@ const cpl_bk_validation_1 = require("../validation/cpl-bk-validation");
 const database_1 = require("../application/database");
 const response_error_1 = require("../error/response-error");
 class CPLBKService {
-    // --- CREATE (Link) CPL-BK ---
     static create(request) {
         return __awaiter(this, void 0, void 0, function* () {
             const createRequest = validation_1.Validation.validate(cpl_bk_validation_1.CPLBKValidation.LINK_UNLINK, request);
-            // Cek apakah CPLProdi dan BahanKajian ada
             const cplExists = yield database_1.prismaClient.cPLProdi.count({ where: { KodeCPL: createRequest.kodeCPL } });
             if (cplExists === 0) {
                 throw new response_error_1.ResponseError(404, "CPL Prodi not found");
@@ -30,7 +27,6 @@ class CPLBKService {
             if (bkExists === 0) {
                 throw new response_error_1.ResponseError(404, "Bahan Kajian not found");
             }
-            // Cek apakah tautan sudah ada
             const existingLink = yield database_1.prismaClient.cPLBK.count({
                 where: {
                     KodeCPL: createRequest.kodeCPL,
@@ -50,7 +46,6 @@ class CPLBKService {
             return (0, cpl_bk_model_1.toCPLBKResponse)(newLink);
         });
     }
-    // --- REMOVE (Unlink) CPL-BK ---
     static remove(request) {
         return __awaiter(this, void 0, void 0, function* () {
             const deleteRequest = validation_1.Validation.validate(cpl_bk_validation_1.CPLBKValidation.LINK_UNLINK, request);
@@ -73,7 +68,6 @@ class CPLBKService {
             });
         });
     }
-    // --- SEARCH / LIST CPL-BK ---
     static search(request) {
         return __awaiter(this, void 0, void 0, function* () {
             const searchRequest = validation_1.Validation.validate(cpl_bk_validation_1.CPLBKValidation.SEARCH, request);

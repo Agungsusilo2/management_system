@@ -1,5 +1,4 @@
 "use strict";
-// src/model/profil-lulusan-model.ts
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.toProfilLulusanResponse = toProfilLulusanResponse;
 function toProfilLulusanResponse(profilLulusan) {

@@ -1,12 +1,10 @@
 "use strict";
-// src/validation/ml-cpmk-submk-validation.ts
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.MLCPMKSubMKValidation = void 0;
 const zod_1 = require("zod");
 class MLCPMKSubMKValidation {
 }
 exports.MLCPMKSubMKValidation = MLCPMKSubMKValidation;
-// Validasi untuk membuat/menghapus tautan
 MLCPMKSubMKValidation.LINK_UNLINK = zod_1.z.object({
     idmk: zod_1.z.string().max(50),
     kodeCPMK: zod_1.z.string().max(50),

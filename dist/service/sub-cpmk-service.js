@@ -1,5 +1,4 @@
 "use strict";
-// src/service/sub-cpmk-service.ts
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -17,7 +16,6 @@ const sub_cpmk_validation_1 = require("../validation/sub-cpmk-validation");
 const database_1 = require("../application/database");
 const response_error_1 = require("../error/response-error");
 class SubCPMKService {
-    // --- CREATE SubCPMK ---
     static create(request) {
         return __awaiter(this, void 0, void 0, function* () {
             const createRequest = validation_1.Validation.validate(sub_cpmk_validation_1.SubCPMKValidation.CREATE, request);
@@ -36,7 +34,6 @@ class SubCPMKService {
             return (0, sub_cpmk_model_1.toSubCPMKResponse)(newSubCPMK);
         });
     }
-    // --- GET SubCPMK by ID ---
     static get(subCPMKId) {
         return __awaiter(this, void 0, void 0, function* () {
             subCPMKId = validation_1.Validation.validate(sub_cpmk_validation_1.SubCPMKValidation.SUB_CPMK_ID, subCPMKId);
@@ -49,7 +46,6 @@ class SubCPMKService {
             return (0, sub_cpmk_model_1.toSubCPMKResponse)(subCpmk);
         });
     }
-    // --- UPDATE SubCPMK ---
     static update(subCPMKId, request) {
         return __awaiter(this, void 0, void 0, function* () {
             var _a;
@@ -70,7 +66,6 @@ class SubCPMKService {
             return (0, sub_cpmk_model_1.toSubCPMKResponse)(updatedSubCPMK);
         });
     }
-    // --- DELETE SubCPMK ---
     static remove(subCPMKId) {
         return __awaiter(this, void 0, void 0, function* () {
             subCPMKId = validation_1.Validation.validate(sub_cpmk_validation_1.SubCPMKValidation.SUB_CPMK_ID, subCPMKId);
@@ -80,7 +75,6 @@ class SubCPMKService {
             if (existingSubCPMKCount === 0) {
                 throw new response_error_1.ResponseError(404, "SubCPMK not found");
             }
-            // Cek apakah ada CPMK yang masih merujuk ke SubCPMK ini
             const cpmkCount = yield database_1.prismaClient.cPMK.count({
                 where: { SubCPMK: subCPMKId }
             });
@@ -92,7 +86,6 @@ class SubCPMKService {
             });
         });
     }
-    // --- SEARCH / LIST SubCPMK ---
     static search(request) {
         return __awaiter(this, void 0, void 0, function* () {
             const searchRequest = validation_1.Validation.validate(sub_cpmk_validation_1.SubCPMKValidation.SEARCH, request);

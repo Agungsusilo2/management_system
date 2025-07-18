@@ -1,5 +1,4 @@
 "use strict";
-// src/service/cpl-pl-service.ts
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -17,11 +16,9 @@ const cpl_pl_validation_1 = require("../validation/cpl-pl-validation");
 const database_1 = require("../application/database");
 const response_error_1 = require("../error/response-error");
 class CPLPLService {
-    // --- CREATE (Link) CPL-PL ---
     static create(request) {
         return __awaiter(this, void 0, void 0, function* () {
             const createRequest = validation_1.Validation.validate(cpl_pl_validation_1.CPLPLValidation.LINK_UNLINK, request);
-            // Cek apakah CPLProdi dan ProfilLulusan ada
             const cplExists = yield database_1.prismaClient.cPLProdi.count({ where: { KodeCPL: createRequest.kodeCPL } });
             if (cplExists === 0) {
                 throw new response_error_1.ResponseError(404, "CPL Prodi not found");
@@ -30,7 +27,6 @@ class CPLPLService {
             if (plExists === 0) {
                 throw new response_error_1.ResponseError(404, "Profil Lulusan not found");
             }
-            // Cek apakah tautan sudah ada
             const existingLink = yield database_1.prismaClient.cPLPL.count({
                 where: {
                     KodeCPL: createRequest.kodeCPL,
@@ -45,12 +41,11 @@ class CPLPLService {
                     KodeCPL: createRequest.kodeCPL,
                     KodePL: createRequest.kodePL,
                 },
-                include: { cplProdi: true, profilLulusan: true } // Sertakan detail relasi untuk response
+                include: { cplProdi: true, profilLulusan: true }
             });
             return (0, cpl_pl_model_1.toCPLPLResponse)(newLink);
         });
     }
-    // --- REMOVE (Unlink) CPL-PL ---
     static remove(request) {
         return __awaiter(this, void 0, void 0, function* () {
             const deleteRequest = validation_1.Validation.validate(cpl_pl_validation_1.CPLPLValidation.LINK_UNLINK, request);
@@ -73,7 +68,6 @@ class CPLPLService {
             });
         });
     }
-    // --- SEARCH / LIST CPL-PL ---
     static search(request) {
         return __awaiter(this, void 0, void 0, function* () {
             const searchRequest = validation_1.Validation.validate(cpl_pl_validation_1.CPLPLValidation.SEARCH, request);
@@ -90,8 +84,8 @@ class CPLPLService {
                     where: { AND: filters },
                     take: searchRequest.size,
                     skip: skip,
-                    include: { cplProdi: true, profilLulusan: true }, // Sertakan detail relasi
-                    orderBy: { KodeCPL: 'asc' } // Urutkan berdasarkan KodeCPL
+                    include: { cplProdi: true, profilLulusan: true },
+                    orderBy: { KodeCPL: 'asc' }
                 }),
                 database_1.prismaClient.cPLPL.count({ where: { AND: filters } })
             ]);

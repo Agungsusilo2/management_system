@@ -1,8 +1,6 @@
 "use strict";
-// src/model/ml-cpmk-submk-model.ts
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.toMLCPMKSubMKResponse = toMLCPMKSubMKResponse;
-// Fungsi transformasi dari objek Prisma ke response type
 function toMLCPMKSubMKResponse(mlCpmkSubMk) {
     return {
         idmk: mlCpmkSubMk.IDMK,

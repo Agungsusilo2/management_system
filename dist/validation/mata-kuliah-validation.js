@@ -1,5 +1,4 @@
 "use strict";
-// src/validation/mata-kuliah-validation.ts
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.MataKuliahValidation = void 0;
 const zod_1 = require("zod");

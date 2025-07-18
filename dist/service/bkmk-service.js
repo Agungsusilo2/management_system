@@ -1,5 +1,4 @@
 "use strict";
-// src/service/bkmk-service.ts
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -17,11 +16,9 @@ const bkmk_validation_1 = require("../validation/bkmk-validation");
 const database_1 = require("../application/database");
 const response_error_1 = require("../error/response-error");
 class BKMKService {
-    // --- CREATE (Link) BKMK ---
     static create(request) {
         return __awaiter(this, void 0, void 0, function* () {
             const createRequest = validation_1.Validation.validate(bkmk_validation_1.BKMKValidation.LINK_UNLINK, request);
-            // Cek apakah BahanKajian dan MataKuliah ada
             const bkExists = yield database_1.prismaClient.bahanKajian.count({ where: { KodeBK: createRequest.kodeBK } });
             if (bkExists === 0) {
                 throw new response_error_1.ResponseError(404, "Bahan Kajian not found");
@@ -30,7 +27,6 @@ class BKMKService {
             if (mkExists === 0) {
                 throw new response_error_1.ResponseError(404, "Mata Kuliah not found");
             }
-            // Cek apakah tautan sudah ada
             const existingLink = yield database_1.prismaClient.bKMK.count({
                 where: {
                     KodeBK: createRequest.kodeBK,
@@ -50,7 +46,6 @@ class BKMKService {
             return (0, bkmk_model_1.toBKMKResponse)(newLink);
         });
     }
-    // --- REMOVE (Unlink) BKMK ---
     static remove(request) {
         return __awaiter(this, void 0, void 0, function* () {
             const deleteRequest = validation_1.Validation.validate(bkmk_validation_1.BKMKValidation.LINK_UNLINK, request);
@@ -73,7 +68,6 @@ class BKMKService {
             });
         });
     }
-    // --- SEARCH / LIST BKMK ---
     static search(request) {
         return __awaiter(this, void 0, void 0, function* () {
             const searchRequest = validation_1.Validation.validate(bkmk_validation_1.BKMKValidation.SEARCH, request);

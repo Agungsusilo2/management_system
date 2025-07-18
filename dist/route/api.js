@@ -1,5 +1,4 @@
 "use strict";
-// src/routes/api-router.ts
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -30,18 +29,17 @@ exports.apiRouter.use(auth_middleware_1.authMiddleware);
 exports.apiRouter.get("/api/users/current", user_controller_1.UserController.get);
 exports.apiRouter.patch("/api/users/current", user_controller_1.UserController.update);
 exports.apiRouter.delete("/api/users/current", user_controller_1.UserController.logout);
-exports.apiRouter.post("/api/admins", admin_controller_1.AdminController.create); // Membuat Admin baru
-exports.apiRouter.get("/api/admins", admin_controller_1.AdminController.search); // Mencari/Melihat daftar Admin
-exports.apiRouter.get("/api/admins/:adminId", admin_controller_1.AdminController.get); // Mendapatkan detail Admin berdasarkan ID
-exports.apiRouter.patch("/api/admins/:adminId", admin_controller_1.AdminController.update); // Mengupdate Admin berdasarkan ID
-exports.apiRouter.delete("/api/admins/:adminId", admin_controller_1.AdminController.remove); // Menghapus Admin berdasarkan ID
-exports.apiRouter.patch("/api/profesi/:kodeProfesi", profesi_controller_1.ProfesiController.update); // UPDATE Profesi
-exports.apiRouter.delete("/api/profesi/:kodeProfesi", profesi_controller_1.ProfesiController.remove); // DELETE Profesi
-// Opsional: Jika admin bisa CREATE dan GET (misal untuk dropdown)
-exports.apiRouter.post("/api/profesi", profesi_controller_1.ProfesiController.create); // CREATE Profesi
-exports.apiRouter.get("/api/profesi/:kodeProfesi", profesi_controller_1.ProfesiController.get); // GET Profesi by ID
-exports.apiRouter.get("/api/profesi", profesi_controller_1.ProfesiController.getAll); // GET Profesi by ID
-// apiRouter.get("/api/profesi", ProfesiController.search); // Jika ada search/list untuk profesi
+exports.apiRouter.post("/api/admins", admin_controller_1.AdminController.create);
+exports.apiRouter.get("/api/admins", admin_controller_1.AdminController.search);
+exports.apiRouter.get("/api/admins/:adminId", admin_controller_1.AdminController.get);
+exports.apiRouter.patch("/api/admins/:adminId", admin_controller_1.AdminController.update);
+exports.apiRouter.delete("/api/admins/:adminId", admin_controller_1.AdminController.remove);
+exports.apiRouter.patch("/api/profesi/:kodeProfesi", profesi_controller_1.ProfesiController.update);
+exports.apiRouter.delete("/api/profesi/:kodeProfesi", profesi_controller_1.ProfesiController.remove);
+exports.apiRouter.post("/api/profesi", profesi_controller_1.ProfesiController.create);
+exports.apiRouter.get("/api/profesi/:kodeProfesi", profesi_controller_1.ProfesiController.get);
+exports.apiRouter.get("/api/profesi", profesi_controller_1.ProfesiController.getAll);
+// apiRouter.get("/api/profesi", ProfesiController.search);
 exports.apiRouter.post("/api/profil-lulusan", profil_lulusan_controller_1.ProfilLulusanController.create);
 exports.apiRouter.patch("/api/profil-lulusan/:plId", profil_lulusan_controller_1.ProfilLulusanController.update);
 exports.apiRouter.delete("/api/profil-lulusan/:plId", profil_lulusan_controller_1.ProfilLulusanController.remove);
@@ -85,21 +83,21 @@ exports.apiRouter.delete("/api/cpmks/:kodeCPMK", cpmk_controller_1.CPMKControlle
 exports.apiRouter.post("/api/cpl-pl", cpl_pl_controller_1.CPLPLController.create);
 exports.apiRouter.delete("/api/cpl-pl", cpl_pl_controller_1.CPLPLController.remove);
 exports.apiRouter.get("/api/cpl-pl", cpl_pl_controller_1.CPLPLController.search);
-exports.apiRouter.post("/api/cpl-bk", cpl_bk_controller_1.CPLBKController.create); // Membuat tautan
-exports.apiRouter.delete("/api/cpl-bk", cpl_bk_controller_1.CPLBKController.remove); // Menghapus tautan (via body)
+exports.apiRouter.post("/api/cpl-bk", cpl_bk_controller_1.CPLBKController.create);
+exports.apiRouter.delete("/api/cpl-bk", cpl_bk_controller_1.CPLBKController.remove);
 exports.apiRouter.get("/api/cpl-bk", cpl_bk_controller_1.CPLBKController.search);
-exports.apiRouter.post("/api/bkmk", bkmk_controller_1.BKMKController.create); // Membuat tautan
-exports.apiRouter.delete("/api/bkmk", bkmk_controller_1.BKMKController.remove); // Menghapus tautan (via body)
+exports.apiRouter.post("/api/bkmk", bkmk_controller_1.BKMKController.create);
+exports.apiRouter.delete("/api/bkmk", bkmk_controller_1.BKMKController.remove);
 exports.apiRouter.get("/api/bkmk", bkmk_controller_1.BKMKController.search);
-exports.apiRouter.post("/api/cpl-mk", cpl_mk_controller_1.CPLMKController.create); // Membuat tautan
-exports.apiRouter.delete("/api/cpl-mk", cpl_mk_controller_1.CPLMKController.remove); // Menghapus tautan (via body)
+exports.apiRouter.post("/api/cpl-mk", cpl_mk_controller_1.CPLMKController.create);
+exports.apiRouter.delete("/api/cpl-mk", cpl_mk_controller_1.CPLMKController.remove);
 exports.apiRouter.get("/api/cpl-mk", cpl_mk_controller_1.CPLMKController.search);
-exports.apiRouter.post("/api/cpl-bkmk", cpl_bkmk_controller_1.CPLBKMKController.create); // Membuat tautan
-exports.apiRouter.delete("/api/cpl-bkmk", cpl_bkmk_controller_1.CPLBKMKController.remove); // Menghapus tautan (via body)
+exports.apiRouter.post("/api/cpl-bkmk", cpl_bkmk_controller_1.CPLBKMKController.create);
+exports.apiRouter.delete("/api/cpl-bkmk", cpl_bkmk_controller_1.CPLBKMKController.remove);
 exports.apiRouter.get("/api/cpl-bkmk", cpl_bkmk_controller_1.CPLBKMKController.search);
-exports.apiRouter.post("/api/ml-cpmk-submk", ml_cpmk_submk_controller_1.MLCPMKSubMKController.create); // Membuat tautan
-exports.apiRouter.delete("/api/ml-cpmk-submk", ml_cpmk_submk_controller_1.MLCPMKSubMKController.remove); // Menghapus tautan (via body)
+exports.apiRouter.post("/api/ml-cpmk-submk", ml_cpmk_submk_controller_1.MLCPMKSubMKController.create);
+exports.apiRouter.delete("/api/ml-cpmk-submk", ml_cpmk_submk_controller_1.MLCPMKSubMKController.remove);
 exports.apiRouter.get("/api/ml-cpmk-submk", ml_cpmk_submk_controller_1.MLCPMKSubMKController.search);
-exports.apiRouter.post("/api/cpl-cpmk-mk", cpl_cpmk_mk_controller_1.CPLCPMKMKController.create); // Membuat tautan
-exports.apiRouter.delete("/api/cpl-cpmk-mk", cpl_cpmk_mk_controller_1.CPLCPMKMKController.remove); // Menghapus tautan (via body)
+exports.apiRouter.post("/api/cpl-cpmk-mk", cpl_cpmk_mk_controller_1.CPLCPMKMKController.create);
+exports.apiRouter.delete("/api/cpl-cpmk-mk", cpl_cpmk_mk_controller_1.CPLCPMKMKController.remove);
 exports.apiRouter.get("/api/cpl-cpmk-mk", cpl_cpmk_mk_controller_1.CPLCPMKMKController.search);

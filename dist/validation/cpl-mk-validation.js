@@ -1,12 +1,10 @@
 "use strict";
-// src/validation/cpl-mk-validation.ts
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CPLMKValidation = void 0;
 const zod_1 = require("zod");
 class CPLMKValidation {
 }
 exports.CPLMKValidation = CPLMKValidation;
-// Validasi untuk membuat/menghapus tautan
 CPLMKValidation.LINK_UNLINK = zod_1.z.object({
     kodeCPL: zod_1.z.string().max(50),
     idmk: zod_1.z.string().max(50),

@@ -1,5 +1,4 @@
 "use strict";
-// src/service/cpmk-service.ts
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -17,7 +16,6 @@ const cpmk_validation_1 = require("../validation/cpmk-validation");
 const database_1 = require("../application/database");
 const response_error_1 = require("../error/response-error");
 class CPMKService {
-    // --- CREATE CPMK ---
     static create(request) {
         return __awaiter(this, void 0, void 0, function* () {
             const createRequest = validation_1.Validation.validate(cpmk_validation_1.CPMKValidation.CREATE, request);
@@ -27,33 +25,23 @@ class CPMKService {
             if (existingCPMK > 0) {
                 throw new response_error_1.ResponseError(400, "CPMK with this KodeCPMK already exists");
             }
-            // Cek apakah subCPMKId valid
             const subCpmkExists = yield database_1.prismaClient.subCPMK.count({
                 where: { SubCPMK: createRequest.subCPMKId }
             });
             if (subCpmkExists === 0) {
                 throw new response_error_1.ResponseError(400, "SubCPMK ID not found");
             }
-            // Cek MataKuliahId jika ada
-            // if (createRequest.idmk) {
-            //     const mkExists = await prismaClient.mataKuliah.count({ where: { IDMK: createRequest.idmk } });
-            //     if (mkExists === 0) {
-            //         throw new ResponseError(400, "Mata Kuliah ID not found");
-            //     }
-            // }
             const newCPMK = yield database_1.prismaClient.cPMK.create({
                 data: {
                     KodeCPMK: createRequest.kodeCPMK,
                     CPMK: createRequest.namaCPMK,
                     SubCPMK: createRequest.subCPMKId,
-                    // IDMK: createRequest.idmk,
                 },
-                include: { subCPMK: true } // Sertakan subCPMK untuk response
+                include: { subCPMK: true }
             });
             return (0, cpmk_model_1.toCPMKResponse)(newCPMK);
         });
     }
-    // --- GET CPMK by ID ---
     static get(kodeCPMK) {
         return __awaiter(this, void 0, void 0, function* () {
             kodeCPMK = validation_1.Validation.validate(cpmk_validation_1.CPMKValidation.KODE_CPMK, kodeCPMK);
@@ -67,7 +55,6 @@ class CPMKService {
             return (0, cpmk_model_1.toCPMKResponse)(cpmk);
         });
     }
-    // --- UPDATE CPMK ---
     static update(kodeCPMK, request) {
         return __awaiter(this, void 0, void 0, function* () {
             var _a, _b;
@@ -79,7 +66,6 @@ class CPMKService {
             if (!existingCPMK) {
                 throw new response_error_1.ResponseError(404, "CPMK not found");
             }
-            // Cek validitas subCPMKId jika diupdate
             if (updateRequest.subCPMKId) {
                 const subCpmkExists = yield database_1.prismaClient.subCPMK.count({
                     where: { SubCPMK: updateRequest.subCPMKId }
@@ -88,26 +74,17 @@ class CPMKService {
                     throw new response_error_1.ResponseError(400, "SubCPMK ID not found");
                 }
             }
-            // Cek MataKuliahId jika diupdate
-            // if (updateRequest.idmk) {
-            //     const mkExists = await prismaClient.mataKuliah.count({ where: { IDMK: updateRequest.idmk } });
-            //     if (mkExists === 0) {
-            //         throw new ResponseError(400, "Mata Kuliah ID not found");
-            //     }
-            // }
             const updatedCPMK = yield database_1.prismaClient.cPMK.update({
                 where: { KodeCPMK: kodeCPMK },
                 data: {
                     CPMK: (_a = updateRequest.namaCPMK) !== null && _a !== void 0 ? _a : existingCPMK.CPMK,
                     SubCPMK: (_b = updateRequest.subCPMKId) !== null && _b !== void 0 ? _b : existingCPMK.SubCPMK,
-                    // IDMK: updateRequest.idmk ?? existingCPMK.IDMK,
                 },
                 include: { subCPMK: true }
             });
             return (0, cpmk_model_1.toCPMKResponse)(updatedCPMK);
         });
     }
-    // --- DELETE CPMK ---
     static remove(kodeCPMK) {
         return __awaiter(this, void 0, void 0, function* () {
             kodeCPMK = validation_1.Validation.validate(cpmk_validation_1.CPMKValidation.KODE_CPMK, kodeCPMK);
@@ -117,16 +94,11 @@ class CPMKService {
             if (existingCPMKCount === 0) {
                 throw new response_error_1.ResponseError(404, "CPMK not found");
             }
-            // --- PENTING: Tambahkan cek relasi ke tabel-tabel lain ---
-            // Contoh: Jika CPMK digunakan di CPL-CPMK atau Penilaian
-            // const cplCpmkCount = await prismaClient.cPMKtoCPL.count({ where: { KodeCPMK: kodeCPMK } });
-            // if (cplCpmkCount > 0) { throw new ResponseError(400, "Cannot delete CPMK: still referenced by CPL-CPMK"); }
             yield database_1.prismaClient.cPMK.delete({
                 where: { KodeCPMK: kodeCPMK }
             });
         });
     }
-    // --- SEARCH / LIST CPMK ---
     static search(request) {
         return __awaiter(this, void 0, void 0, function* () {
             const searchRequest = validation_1.Validation.validate(cpmk_validation_1.CPMKValidation.SEARCH, request);
@@ -145,11 +117,6 @@ class CPMKService {
                     SubCPMK: searchRequest.subCPMKId
                 });
             }
-            // if (searchRequest.idmk) {
-            //     filters.push({
-            //         IDMK: searchRequest.idmk
-            //     });
-            // }
             const [cpmkList, total] = yield database_1.prismaClient.$transaction([
                 database_1.prismaClient.cPMK.findMany({
                     where: { AND: filters },

@@ -1,5 +1,4 @@
 "use strict";
-// src/service/cpl-bkmk-service.ts
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -17,11 +16,9 @@ const cpl_bkmk_validation_1 = require("../validation/cpl-bkmk-validation");
 const database_1 = require("../application/database");
 const response_error_1 = require("../error/response-error");
 class CPLBKMKService {
-    // --- CREATE (Link) CPLBKMK ---
     static create(request) {
         return __awaiter(this, void 0, void 0, function* () {
             const createRequest = validation_1.Validation.validate(cpl_bkmk_validation_1.CPLBKMKValidation.LINK_UNLINK, request);
-            // Cek apakah CPLProdi, BahanKajian, dan MataKuliah ada
             const cplExists = yield database_1.prismaClient.cPLProdi.count({ where: { KodeCPL: createRequest.kodeCPL } });
             if (cplExists === 0) {
                 throw new response_error_1.ResponseError(404, "CPL Prodi not found");
@@ -34,7 +31,6 @@ class CPLBKMKService {
             if (mkExists === 0) {
                 throw new response_error_1.ResponseError(404, "Mata Kuliah not found");
             }
-            // Cek apakah tautan sudah ada
             const existingLink = yield database_1.prismaClient.cPLBKMK.count({
                 where: {
                     KodeCPL: createRequest.kodeCPL,
@@ -56,7 +52,6 @@ class CPLBKMKService {
             return (0, cpl_bkmk_model_1.toCPLBKMKResponse)(newLink);
         });
     }
-    // --- REMOVE (Unlink) CPLBKMK ---
     static remove(request) {
         return __awaiter(this, void 0, void 0, function* () {
             const deleteRequest = validation_1.Validation.validate(cpl_bkmk_validation_1.CPLBKMKValidation.LINK_UNLINK, request);
@@ -72,7 +67,6 @@ class CPLBKMKService {
             }
             yield database_1.prismaClient.cPLBKMK.delete({
                 where: {
-                    // Menggunakan nama composite primary key dari Prisma untuk 3 kolom
                     KodeCPL_KodeBK_IDMK: {
                         KodeCPL: deleteRequest.kodeCPL,
                         KodeBK: deleteRequest.kodeBK,
@@ -82,7 +76,6 @@ class CPLBKMKService {
             });
         });
     }
-    // --- SEARCH / LIST CPLBKMK ---
     static search(request) {
         return __awaiter(this, void 0, void 0, function* () {
             const searchRequest = validation_1.Validation.validate(cpl_bkmk_validation_1.CPLBKMKValidation.SEARCH, request);
