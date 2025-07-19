@@ -9,23 +9,24 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.MataKuliahController = void 0;
-const mata_kuliah_service_1 = require("../service/mata-kuliah-service");
+exports.LingkupKelasController = void 0;
+const lingkup_kelas_service_1 = require("../service/lingkup-kelas-service");
 const logging_1 = require("../application/logging");
 const response_error_1 = require("../error/response-error");
-class MataKuliahController {
-    // Helper method for authorization
+class AuthUtil {
     static authorizeAdmin(user) {
         if (!user || user.user_type !== 'Admin') {
             throw new response_error_1.ResponseError(403, "Forbidden: Only administrators can perform this action.");
         }
     }
+}
+class LingkupKelasController {
     static create(req, res, next) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                MataKuliahController.authorizeAdmin(req.user); // Authorize admin
+                AuthUtil.authorizeAdmin(req.user);
                 const request = req.body;
-                const response = yield mata_kuliah_service_1.MataKuliahService.create(request);
+                const response = yield lingkup_kelas_service_1.LingkupKelasService.create(request);
                 logging_1.logger.debug(response);
                 res.status(201).json({ data: response });
             }
@@ -37,9 +38,9 @@ class MataKuliahController {
     static get(req, res, next) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                MataKuliahController.authorizeAdmin(req.user);
-                const idmk = req.params.idmk;
-                const response = yield mata_kuliah_service_1.MataKuliahService.get(idmk);
+                AuthUtil.authorizeAdmin(req.user);
+                const idLingkupKelas = req.params.idLingkupKelas;
+                const response = yield lingkup_kelas_service_1.LingkupKelasService.get(idLingkupKelas);
                 logging_1.logger.debug(response);
                 res.status(200).json({ data: response });
             }
@@ -48,14 +49,13 @@ class MataKuliahController {
             }
         });
     }
-    // --- UPDATE ---
     static update(req, res, next) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                MataKuliahController.authorizeAdmin(req.user);
-                const idmk = req.params.idmk;
+                AuthUtil.authorizeAdmin(req.user);
+                const idLingkupKelas = req.params.idLingkupKelas;
                 const request = req.body;
-                const response = yield mata_kuliah_service_1.MataKuliahService.update(idmk, request);
+                const response = yield lingkup_kelas_service_1.LingkupKelasService.update(idLingkupKelas, request);
                 logging_1.logger.debug(response);
                 res.status(200).json({ data: response });
             }
@@ -67,10 +67,10 @@ class MataKuliahController {
     static remove(req, res, next) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                MataKuliahController.authorizeAdmin(req.user);
-                const idmk = req.params.idmk;
-                yield mata_kuliah_service_1.MataKuliahService.remove(idmk);
-                logging_1.logger.debug("Mata Kuliah removed successfully");
+                AuthUtil.authorizeAdmin(req.user);
+                const idLingkupKelas = req.params.idLingkupKelas;
+                yield lingkup_kelas_service_1.LingkupKelasService.remove(idLingkupKelas);
+                logging_1.logger.debug("Lingkup Kelas removed successfully");
                 res.status(200).json({ data: "OK" });
             }
             catch (e) {
@@ -81,20 +81,13 @@ class MataKuliahController {
     static search(req, res, next) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                MataKuliahController.authorizeAdmin(req.user);
+                AuthUtil.authorizeAdmin(req.user);
                 const request = {
-                    idmk: req.query.idmk,
-                    namaMk: req.query.namaMk,
-                    kodeSemester: req.query.kodeSemester,
-                    jenisMKId: req.query.jenisMKId,
-                    kelompokMKId: req.query.kelompokMKId,
-                    lingkupKelasId: req.query.lingkupKelasId,
-                    modeKuliahId: req.query.modeKuliahId,
-                    metodePembelajaranId: req.query.metodePembelajaranId,
+                    namaLingkupKelas: req.query.namaLingkupKelas,
                     page: req.query.page ? Number(req.query.page) : undefined,
                     size: req.query.size ? Number(req.query.size) : undefined,
                 };
-                const [response, total] = yield mata_kuliah_service_1.MataKuliahService.search(request); // Call service
+                const [response, total] = yield lingkup_kelas_service_1.LingkupKelasService.search(request);
                 logging_1.logger.debug(response);
                 res.status(200).json({
                     data: response,
@@ -112,4 +105,4 @@ class MataKuliahController {
         });
     }
 }
-exports.MataKuliahController = MataKuliahController;
+exports.LingkupKelasController = LingkupKelasController;

@@ -1,78 +1,155 @@
-
-import { MataKuliahResponse, CreateMataKuliahRequest, UpdateMataKuliahRequest, SearchMataKuliahRequest, toMataKuliahResponse } from "../model/mata-kuliah-model";
 import { Validation } from "../validation/validation";
-import { MataKuliahValidation } from "../validation/mata-kuliah-validation";
 import { prismaClient } from "../application/database";
 import { ResponseError } from "../error/response-error";
 
-export class MataKuliahService {
+import { MataKuliahValidation } from "../validation/mata-kuliah-validation";
+import { MataKuliahResponse, CreateMataKuliahRequest, UpdateMataKuliahRequest, SearchMataKuliahRequest, toMataKuliahResponse } from "../model/mata-kuliah-model"; // Adjust path as needed
 
+export class MataKuliahService {
     static async create(request: CreateMataKuliahRequest): Promise<MataKuliahResponse> {
         const createRequest = Validation.validate(MataKuliahValidation.CREATE, request);
 
-        const existingMK = await prismaClient.mataKuliah.count({
+        // Check if IDMK already exists
+        const existingMataKuliah = await prismaClient.mataKuliah.count({
             where: { IDMK: createRequest.idmk }
         });
-        if (existingMK > 0) {
+        if (existingMataKuliah > 0) {
             throw new ResponseError(400, "Mata Kuliah with this IDMK already exists");
         }
 
-        const newMK = await prismaClient.mataKuliah.create({
+        const newMataKuliah = await prismaClient.mataKuliah.create({
             data: {
                 IDMK: createRequest.idmk,
                 NamaMK: createRequest.namaMk,
+                ...(createRequest.kodeSemester && { semester: { connect: { KodeSemester: createRequest.kodeSemester } } }),
+                ...(createRequest.jenisMKId && { jenis_mk: { connect: { id_jenis_mk: createRequest.jenisMKId } } }),
+                ...(createRequest.kelompokMKId && { kelompok_mk: { connect: { id_kelompok_mk: createRequest.kelompokMKId } } }),
+                ...(createRequest.lingkupKelasId && { lingkup_kelas: { connect: { id_lingkup_kelas: createRequest.lingkupKelasId } } }),
+                ...(createRequest.modeKuliahId && { mode_kuliah: { connect: { id_mode_kuliah: createRequest.modeKuliahId } } }),
+                ...(createRequest.metodePembelajaranId && { metode_pembelajaran: { connect: { id_metode_pembelajaran: createRequest.metodePembelajaranId } } }),
             },
         });
 
-        return toMataKuliahResponse(newMK);
+        return toMataKuliahResponse(newMataKuliah);
     }
-
 
     static async get(idmk: string): Promise<MataKuliahResponse> {
         idmk = Validation.validate(MataKuliahValidation.IDMK, idmk);
 
-        const mk = await prismaClient.mataKuliah.findUnique({
+        const mataKuliah = await prismaClient.mataKuliah.findUnique({
             where: { IDMK: idmk },
+            include: {
+                semester: true,
+                sksMataKuliah: true,
+                jenis_mk: true,
+                kelompok_mk: true,
+                lingkup_kelas: true,
+                mode_kuliah: true,
+                metode_pembelajaran: true,
+            }
         });
 
-        if (!mk) {
+        if (!mataKuliah) {
             throw new ResponseError(404, "Mata Kuliah not found");
         }
 
-        return toMataKuliahResponse(mk);
+        return toMataKuliahResponse(mataKuliah);
     }
 
     static async update(idmk: string, request: UpdateMataKuliahRequest): Promise<MataKuliahResponse> {
         idmk = Validation.validate(MataKuliahValidation.IDMK, idmk);
         const updateRequest = Validation.validate(MataKuliahValidation.UPDATE, request);
 
-        const existingMK = await prismaClient.mataKuliah.findUnique({
+        const existingMataKuliah = await prismaClient.mataKuliah.findUnique({
             where: { IDMK: idmk }
         });
 
-        if (!existingMK) {
+        if (!existingMataKuliah) {
             throw new ResponseError(404, "Mata Kuliah not found");
         }
 
-        const updatedMK = await prismaClient.mataKuliah.update({
+        const updateData: any = {
+            NamaMK: updateRequest.namaMk ?? existingMataKuliah.NamaMK,
+        };
+
+        if (updateRequest.kodeSemester !== undefined) {
+            updateData.semester = updateRequest.kodeSemester === null
+                ? { disconnect: true }
+                : { connect: { KodeSemester: updateRequest.kodeSemester } };
+        }
+        if (updateRequest.jenisMKId !== undefined) {
+            updateData.jenis_mk = updateRequest.jenisMKId === null
+                ? { disconnect: true }
+                : { connect: { id_jenis_mk: updateRequest.jenisMKId } };
+        }
+        if (updateRequest.kelompokMKId !== undefined) {
+            updateData.kelompok_mk = updateRequest.kelompokMKId === null
+                ? { disconnect: true }
+                : { connect: { id_kelompok_mk: updateRequest.kelompokMKId } };
+        }
+        if (updateRequest.lingkupKelasId !== undefined) {
+            updateData.lingkup_kelas = updateRequest.lingkupKelasId === null
+                ? { disconnect: true }
+                : { connect: { id_lingkup_kelas: updateRequest.lingkupKelasId } };
+        }
+        if (updateRequest.modeKuliahId !== undefined) {
+            updateData.mode_kuliah = updateRequest.modeKuliahId === null
+                ? { disconnect: true }
+                : { connect: { id_mode_kuliah: updateRequest.modeKuliahId } };
+        }
+        if (updateRequest.metodePembelajaranId !== undefined) {
+            updateData.metode_pembelajaran = updateRequest.metodePembelajaranId === null
+                ? { disconnect: true }
+                : { connect: { id_metode_pembelajaran: updateRequest.metodePembelajaranId } };
+        }
+
+        const updatedMataKuliah = await prismaClient.mataKuliah.update({
             where: { IDMK: idmk },
-            data: {
-                NamaMK: updateRequest.namaMk ?? existingMK.NamaMK,
+            data: updateData,
+            include: {
+                semester: true,
+                sksMataKuliah: true,
+                jenis_mk: true,
+                kelompok_mk: true,
+                lingkup_kelas: true,
+                mode_kuliah: true,
+                metode_pembelajaran: true,
             }
         });
 
-        return toMataKuliahResponse(updatedMK);
+        return toMataKuliahResponse(updatedMataKuliah);
     }
 
     static async remove(idmk: string): Promise<void> {
         idmk = Validation.validate(MataKuliahValidation.IDMK, idmk);
 
-        const existingMKCount = await prismaClient.mataKuliah.count({
+        const existingMataKuliahCount = await prismaClient.mataKuliah.count({
             where: { IDMK: idmk }
         });
 
-        if (existingMKCount === 0) {
+        if (existingMataKuliahCount === 0) {
             throw new ResponseError(404, "Mata Kuliah not found");
+        }
+        
+        const bkmkCount = await prismaClient.bKMK.count({ where: { IDMK: idmk } });
+        if (bkmkCount > 0) {
+            throw new ResponseError(400, "Cannot delete Mata Kuliah: still referenced by BKMK");
+        }
+        const cplmkCount = await prismaClient.cPLMK.count({ where: { IDMK: idmk } });
+        if (cplmkCount > 0) {
+            throw new ResponseError(400, "Cannot delete Mata Kuliah: still referenced by CPLMK");
+        }
+        const cplbkmkCount = await prismaClient.cPLBKMK.count({ where: { IDMK: idmk } });
+        if (cplbkmkCount > 0) {
+            throw new ResponseError(400, "Cannot delete Mata Kuliah: still referenced by CPLBKMK");
+        }
+        const mlcpmksubmkCount = await prismaClient.mLCPMKSubMK.count({ where: { IDMK: idmk } });
+        if (mlcpmksubmkCount > 0) {
+            throw new ResponseError(400, "Cannot delete Mata Kuliah: still referenced by MLCPMKSubMK");
+        }
+        const cplcpmkmkCount = await prismaClient.cPLCPMKMK.count({ where: { IDMK: idmk } });
+        if (cplcpmkmkCount > 0) {
+            throw new ResponseError(400, "Cannot delete Mata Kuliah: still referenced by CPLCPMKMK");
         }
 
         await prismaClient.mataKuliah.delete({
@@ -83,35 +160,55 @@ export class MataKuliahService {
     static async search(request: SearchMataKuliahRequest): Promise<[MataKuliahResponse[], number]> {
         const searchRequest = Validation.validate(MataKuliahValidation.SEARCH, request);
 
-        const page = searchRequest.page ?? 1;
-        const size = searchRequest.size ?? 10;
-        const skip = (page - 1) * size;
+        const skip = (searchRequest.page! - 1) * searchRequest.size!;
+        const filters: any[] = [];
 
-        const filters = [];
-
+        if (searchRequest.idmk) {
+            filters.push({ IDMK: { contains: searchRequest.idmk, mode: 'insensitive' } });
+        }
         if (searchRequest.namaMk) {
-            filters.push({
-                NamaMK: {
-                    contains: searchRequest.namaMk,
-                    mode: 'insensitive',
-                }
-            });
+            filters.push({ NamaMK: { contains: searchRequest.namaMk, mode: 'insensitive' } });
+        }
+        if (searchRequest.kodeSemester) {
+            filters.push({ KodeSemester: searchRequest.kodeSemester });
+        }
+        if (searchRequest.jenisMKId) {
+            filters.push({ jenisMKId: searchRequest.jenisMKId });
+        }
+        if (searchRequest.kelompokMKId) {
+            filters.push({ kelompokMKId: searchRequest.kelompokMKId });
+        }
+        if (searchRequest.lingkupKelasId) {
+            filters.push({ lingkupKelasId: searchRequest.lingkupKelasId });
+        }
+        if (searchRequest.modeKuliahId) {
+            filters.push({ modeKuliahId: searchRequest.modeKuliahId });
+        }
+        if (searchRequest.metodePembelajaranId) {
+            filters.push({ metodePembelajaranId: searchRequest.metodePembelajaranId });
         }
 
-        const [mataKuliahList, total] = await prismaClient.$transaction([
+        const [mataKuliahs, total] = await prismaClient.$transaction([
             prismaClient.mataKuliah.findMany({
                 where: { AND: filters },
-                take: size,
+                take: searchRequest.size,
                 skip: skip,
                 orderBy: { IDMK: 'asc' },
+                include: { // Include relations for search results to populate response fields
+                    semester: true,
+                    sksMataKuliah: true,
+                    jenis_mk: true,
+                    kelompok_mk: true,
+                    lingkup_kelas: true,
+                    mode_kuliah: true,
+                    metode_pembelajaran: true,
+                }
             }),
-            prismaClient.mataKuliah.count({
-                where: { AND: filters }
-            })
+            prismaClient.mataKuliah.count({ where: { AND: filters } })
         ]);
 
-        const responses = mataKuliahList.map(toMataKuliahResponse);
+        const responses = mataKuliahs.map(toMataKuliahResponse);
+
         return [responses, total];
     }
-
 }

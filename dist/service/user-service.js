@@ -106,5 +106,35 @@ class UserService {
             return (0, user_model_1.toUserResponse)(result);
         });
     }
+    static getAll() {
+        return __awaiter(this, arguments, void 0, function* (page = 1, size = 10) {
+            page = Math.max(1, page);
+            size = Math.max(1, Math.min(100, size));
+            const skip = (page - 1) * size;
+            const filters = {
+                user_type: {
+                    // <--- CAST THE ARRAY TO UserType[]
+                    in: ["Admin", "Dosen"]
+                }
+            };
+            const [users, total] = yield database_1.prismaClient.$transaction([
+                database_1.prismaClient.user.findMany({
+                    where: filters,
+                    take: size,
+                    skip: skip,
+                    orderBy: {
+                        username: 'asc'
+                    },
+                }),
+                database_1.prismaClient.user.count({ where: filters })
+            ]);
+            const responses = users.map(user => {
+                const userResponse = (0, user_model_1.toUserResponse)(user);
+                delete userResponse.token;
+                return userResponse;
+            });
+            return [responses, total];
+        });
+    }
 }
 exports.UserService = UserService;

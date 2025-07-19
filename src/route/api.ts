@@ -19,6 +19,13 @@ import {CPLBKMKController} from "../controller/cpl-bkmk-controller";
 import {MLCPMKSubMKController} from "../controller/ml-cpmk-submk-controller";
 import {CPLCPMKMKController} from "../controller/cpl-cpmk-mk-controller";
 import {CPLProdiController} from "../controller/cpl-prodi-controller";
+import {JenisMKController} from "../controller/jenis-mk-controller";
+import {KelompokMKController} from "../controller/kelompok-mk-controller";
+import {LingkupKelasController} from "../controller/lingkup-mk-kelas";
+import {ModeKuliahController} from "../controller/mode-kuliah-controller";
+import {MetodePembelajaranController} from "../controller/metode-pembelajaran-controller";
+import {SemesterController} from "../controller/semester-controller";
+import {SKSMataKuliahController} from "../controller/sks-semester-controller";
 
 export const apiRouter = express.Router();
 
@@ -27,6 +34,7 @@ apiRouter.use(authMiddleware);
 apiRouter.get("/api/users/current", UserController.get);
 apiRouter.patch("/api/users/current", UserController.update);
 apiRouter.delete("/api/users/current",UserController.logout)
+apiRouter.get("/api/users",UserController.getAll)
 
 apiRouter.post("/api/admins", AdminController.create);
 apiRouter.get("/api/admins", AdminController.search);
@@ -126,3 +134,45 @@ apiRouter.get("/api/ml-cpmk-submk", MLCPMKSubMKController.search);
 apiRouter.post("/api/cpl-cpmk-mk", CPLCPMKMKController.create);
 apiRouter.delete("/api/cpl-cpmk-mk", CPLCPMKMKController.remove);
 apiRouter.get("/api/cpl-cpmk-mk", CPLCPMKMKController.search);
+
+apiRouter.post('/api/jenis-mk', JenisMKController.create);
+apiRouter.get('/api/jenis-mk/:idJenisMk', JenisMKController.get);
+apiRouter.patch('/api/jenis-mk/:idJenisMk', JenisMKController.update);
+apiRouter.delete('/api/jenis-mk/:idJenisMk', JenisMKController.remove);
+apiRouter.get('/api/jenis-mk', JenisMKController.search);
+
+apiRouter.post('/api/kelompok-mk', KelompokMKController.create);
+apiRouter.get('/api/kelompok-mk/:idKelompokMk', KelompokMKController.get);
+apiRouter.patch('/api/kelompok-mk/:idKelompokMk', KelompokMKController.update);
+apiRouter.delete('/api/kelompok-mk/:idKelompokMk', KelompokMKController.remove);
+apiRouter.get('/api/kelompok-mk', KelompokMKController.search);
+
+apiRouter.post('/api/lingkup-kelas', LingkupKelasController.create);
+apiRouter.get('/api/lingkup-kelas/:idLingkupKelas', LingkupKelasController.get);
+apiRouter.patch('/api/lingkup-kelas/:idLingkupKelas', LingkupKelasController.update);
+apiRouter.delete('/api/lingkup-kelas/:idLingkupKelas', LingkupKelasController.remove);
+apiRouter.get('/api/lingkup-kelas', LingkupKelasController.search);
+
+apiRouter.post('/api/mode-kuliah', ModeKuliahController.create);
+apiRouter.get('/api/mode-kuliah/:idModeKuliah', ModeKuliahController.get);
+apiRouter.patch('/api/mode-kuliah/:idModeKuliah', ModeKuliahController.update);
+apiRouter.delete('/api/mode-kuliah/:idModeKuliah', ModeKuliahController.remove);
+apiRouter.get('/api/mode-kuliah', ModeKuliahController.search);
+
+apiRouter.post('/api/metode-pembelajaran', MetodePembelajaranController.create);
+apiRouter.get('/api/metode-pembelajaran/:idMetodePembelajaran', MetodePembelajaranController.get);
+apiRouter.patch('/api/metode-pembelajaran/:idMetodePembelajaran', MetodePembelajaranController.update);
+apiRouter.delete('/api/metode-pembelajaran/:idMetodePembelajaran', MetodePembelajaranController.remove);
+apiRouter.get('/api/metode-pembelajaran', MetodePembelajaranController.search);
+
+apiRouter.post('/api/semester', SemesterController.create);
+apiRouter.get('/api/semester/:kodeSemester', SemesterController.get);
+apiRouter.patch('/api/semester/:kodeSemester', SemesterController.update);
+apiRouter.delete('/api/semester/:kodeSemester', SemesterController.remove);
+apiRouter.get('/api/semester', SemesterController.search);
+
+apiRouter.post('/api/sks-mata-kuliah', SKSMataKuliahController.create);
+apiRouter.get('/api/sks-mata-kuliah/:kodeSKS', SKSMataKuliahController.get);
+apiRouter.patch('/api/sks-mata-kuliah/:kodeSKS', SKSMataKuliahController.update);
+apiRouter.delete('/api/sks-mata-kuliah/:kodeSKS', SKSMataKuliahController.remove);
+apiRouter.get('/api/sks-mata-kuliah', SKSMataKuliahController.search);

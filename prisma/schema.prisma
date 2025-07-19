@@ -127,11 +127,9 @@ model BahanKajian {
 model CPLBK {
   KodeCPL     String      @map("KodeCPL") @db.VarChar(50)
   KodeBK      String      @map("KodeBK") @db.VarChar(50)
-  // Relations to CPLProdi and BahanKajian
   cplProdi    CPLProdi    @relation(fields: [KodeCPL], references: [KodeCPL])
   bahanKajian BahanKajian @relation(fields: [KodeBK], references: [KodeBK])
 
-  // Define composite primary key
   @@id([KodeCPL, KodeBK])
   @@map("CPL_BK")
 }
@@ -144,6 +142,26 @@ model MataKuliah {
   CPLBKMK     CPLBKMK[]
   MLCPMKSubMK MLCPMKSubMK[]
   CPLCPMKMK   CPLCPMKMK[]
+
+  KodeSemester String?   @map("KodeSemester_Fk")
+  semester     Semester? @relation(fields: [KodeSemester], references: [KodeSemester])
+
+  sksMataKuliah SKSMataKuliah?
+
+  jenisMKId String?
+  jenis_mk  JenisMK? @relation(fields: [jenisMKId], references: [id_jenis_mk])
+
+  kelompokMKId String?
+  kelompok_mk  KelompokMK? @relation(fields: [kelompokMKId], references: [id_kelompok_mk])
+
+  lingkupKelasId String?
+  lingkup_kelas  LingkupKelas? @relation(fields: [lingkupKelasId], references: [id_lingkup_kelas])
+
+  modeKuliahId String?
+  mode_kuliah  ModeKuliah? @relation(fields: [modeKuliahId], references: [id_mode_kuliah])
+
+  metodePembelajaranId String?
+  metode_pembelajaran  MetodePembelajaran? @relation(fields: [metodePembelajaranId], references: [id_metode_pembelajaran])
 
   @@map("Mata_Kuliah")
 }
@@ -224,4 +242,56 @@ model CPLCPMKMK {
 
   @@id([KodeCPL, KodeCPMK, IDMK])
   @@map("CPL_CPMK_MK")
+}
+
+model JenisMK {
+  id_jenis_mk   String       @id @default(uuid()) @map("id_jenis_mk")
+  nama_jenis_mk String       @unique @db.VarChar(50)
+  mataKuliahs   MataKuliah[]
+}
+
+model KelompokMK {
+  id_kelompok_mk   String       @id @default(uuid()) @map("id_kelompok_mk")
+  nama_kelompok_mk String       @unique @db.VarChar(50)
+  mataKuliahs      MataKuliah[]
+}
+
+model LingkupKelas {
+  id_lingkup_kelas   String       @id @default(uuid()) @map("id_lingkup_kelas")
+  nama_lingkup_kelas String       @unique @db.VarChar(50)
+  mataKuliahs        MataKuliah[]
+}
+
+model ModeKuliah {
+  id_mode_kuliah   String       @id @default(uuid()) @map("id_mode_kuliah")
+  nama_mode_kuliah String       @unique @db.VarChar(50)
+  mataKuliahs      MataKuliah[]
+}
+
+model MetodePembelajaran {
+  id_metode_pembelajaran   String       @id @default(uuid()) @map("id_metode_pembelajaran")
+  nama_metode_pembelajaran String       @unique @db.VarChar(100)
+  mataKuliahs              MataKuliah[]
+}
+
+model Semester {
+  KodeSemester String       @id @default(uuid()) @map("KodeSemester")
+  SemesterInt  Int          @map("Semester")
+  mataKuliahs  MataKuliah[]
+
+  @@map("Semester")
+}
+
+model SKSMataKuliah {
+  KodeSKS              String @id @default(uuid()) @map("KodeSKS")
+  BobotTatapMuka       Int    @map("BobotTatapMuka")
+  BobotPraktikum       Int    @map("BobotPraktikum")
+  BobotPraktekLapangan Int    @map("BobotPraktekLapangan")
+  BobotSimulasi        Int    @map("BobotSimulasi")
+  TotalBobot           Int    @map("TotalBobot")
+
+  IDMK       String     @unique @map("IDMK_Fk") @db.VarChar(50)
+  mataKuliah MataKuliah @relation(fields: [IDMK], references: [IDMK], onDelete: Cascade)
+
+  @@map("SKS_Mata_Kuliah")
 }

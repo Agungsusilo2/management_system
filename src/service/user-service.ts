@@ -11,7 +11,8 @@ import {prismaClient} from "../application/database";
 import {ResponseError} from "../error/response-error";
 import bcrypt from "bcrypt"
 import { v4 as uuidv4 } from 'uuid';
-import {User} from "../../generated/prisma";
+import {$Enums, User} from "../../generated/prisma";
+import UserType = $Enums.UserType;
 
 export class UserService{
     static async register(request:CreateUserRequest):Promise<UserResponse>{
@@ -121,4 +122,37 @@ export class UserService{
         return toUserResponse(result)
     }
 
+    static async getAll(page: number = 1, size: number = 10): Promise<[UserResponse[], number]> {
+        page = Math.max(1, page);
+        size = Math.max(1, Math.min(100, size));
+
+        const skip = (page - 1) * size;
+
+        const filters = {
+            user_type: {
+                // <--- CAST THE ARRAY TO UserType[]
+                in: ["Admin", "Dosen"] as UserType[]
+            }
+        };
+
+        const [users, total] = await prismaClient.$transaction([
+            prismaClient.user.findMany({
+                where: filters,
+                take: size,
+                skip: skip,
+                orderBy: {
+                    username: 'asc'
+                },
+            }),
+            prismaClient.user.count({ where: filters })
+        ]);
+
+        const responses = users.map(user => {
+            const userResponse = toUserResponse(user);
+            delete userResponse.token;
+            return userResponse;
+        });
+
+        return [responses, total];
+    }
 }

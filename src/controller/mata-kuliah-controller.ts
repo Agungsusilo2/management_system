@@ -1,7 +1,5 @@
-// src/controller/mata-kuliah-controller.ts
-
 import { NextFunction, Response } from "express";
-import { CreateMataKuliahRequest, UpdateMataKuliahRequest, SearchMataKuliahRequest } from "../model/mata-kuliah-model";
+import { CreateMataKuliahRequest, UpdateMataKuliahRequest, SearchMataKuliahRequest, MataKuliahResponse } from "../model/mata-kuliah-model"; // Adjust path as needed
 import { MataKuliahService } from "../service/mata-kuliah-service";
 import { logger } from "../application/logging";
 import { ResponseError } from "../error/response-error";
@@ -9,18 +7,18 @@ import {UserRequest} from "../type/user-request";
 
 export class MataKuliahController {
 
+    // Helper method for authorization
     private static authorizeAdmin(user: UserRequest['user']) {
         if (!user || user.user_type !== 'Admin') {
             throw new ResponseError(403, "Forbidden: Only administrators can perform this action.");
         }
     }
 
-    // --- CREATE ---
     static async create(req: UserRequest, res: Response, next: NextFunction) {
         try {
-            MataKuliahController.authorizeAdmin(req.user);
+            MataKuliahController.authorizeAdmin(req.user); // Authorize admin
             const request: CreateMataKuliahRequest = req.body as CreateMataKuliahRequest;
-            const response = await MataKuliahService.create(request);
+            const response: MataKuliahResponse = await MataKuliahService.create(request);
 
             logger.debug(response);
             res.status(201).json({ data: response });
@@ -29,12 +27,11 @@ export class MataKuliahController {
         }
     }
 
-    // --- GET by ID ---
     static async get(req: UserRequest, res: Response, next: NextFunction) {
         try {
-            MataKuliahController.authorizeAdmin(req.user); // Admin-only GET
+            MataKuliahController.authorizeAdmin(req.user);
             const idmk: string = req.params.idmk;
-            const response = await MataKuliahService.get(idmk);
+            const response: MataKuliahResponse = await MataKuliahService.get(idmk);
 
             logger.debug(response);
             res.status(200).json({ data: response });
@@ -49,7 +46,7 @@ export class MataKuliahController {
             MataKuliahController.authorizeAdmin(req.user);
             const idmk: string = req.params.idmk;
             const request: UpdateMataKuliahRequest = req.body as UpdateMataKuliahRequest;
-            const response = await MataKuliahService.update(idmk, request);
+            const response: MataKuliahResponse = await MataKuliahService.update(idmk, request);
 
             logger.debug(response);
             res.status(200).json({ data: response });
@@ -58,7 +55,6 @@ export class MataKuliahController {
         }
     }
 
-    // --- DELETE ---
     static async remove(req: UserRequest, res: Response, next: NextFunction) {
         try {
             MataKuliahController.authorizeAdmin(req.user);
@@ -72,17 +68,23 @@ export class MataKuliahController {
         }
     }
 
-    // --- SEARCH / LIST ---
     static async search(req: UserRequest, res: Response, next: NextFunction) {
         try {
-            MataKuliahController.authorizeAdmin(req.user); // Admin-only SEARCH
+            MataKuliahController.authorizeAdmin(req.user);
             const request: SearchMataKuliahRequest = {
+                idmk: req.query.idmk as string | undefined,
                 namaMk: req.query.namaMk as string | undefined,
+                kodeSemester: req.query.kodeSemester as string | undefined,
+                jenisMKId: req.query.jenisMKId as string | undefined,
+                kelompokMKId: req.query.kelompokMKId as string | undefined,
+                lingkupKelasId: req.query.lingkupKelasId as string | undefined,
+                modeKuliahId: req.query.modeKuliahId as string | undefined,
+                metodePembelajaranId: req.query.metodePembelajaranId as string | undefined,
                 page: req.query.page ? Number(req.query.page) : undefined,
                 size: req.query.size ? Number(req.query.size) : undefined,
             };
 
-            const [response, total] = await MataKuliahService.search(request);
+            const [response, total] = await MataKuliahService.search(request); // Call service
 
             logger.debug(response);
             res.status(200).json({
